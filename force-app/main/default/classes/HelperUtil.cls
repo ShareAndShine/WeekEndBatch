@@ -24,6 +24,24 @@ public class HelperUtil {
         return objDate;
     }
 
+    public static void getUserDetails() {
+        // Retrieve the current user's details
+        User currentUser = [SELECT Id, Username, Email, Profile.Name FROM User WHERE Id = :UserInfo.getUserId()];
+        
+        // Display the user's details
+        System.debug('Current User ID: ' + currentUser.Id);
+        System.debug('Current User Username: ' + currentUser.Username);
+        System.debug('Current User Email: ' + currentUser.Email);
+        System.debug('Current User Profile Name: ' + currentUser.Profile.Name);
+    }
+
+    public static void getCurrentOrgUrl() {
+        // Get the current organization URL
+        String currentOrgUrl = URL.getSalesforceBaseUrl().toExternalForm();
+        
+        // Display the current organization URL
+        System.debug('Current Organization URL: ' + currentOrgUrl);
+    }
 
     public static Integer getOddNumbers()
     {
