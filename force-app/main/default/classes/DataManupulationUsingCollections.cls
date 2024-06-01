@@ -133,9 +133,17 @@ public with sharing class DataManupulationUsingCollections {
             // Write code to log the error in a chatter group for developers to check and resolve
             // Write code to create a task to developer to resolve the error
         }
+        /*catch(AdlineException objAdline)
+        {
+            System.debug('I am a custom exception');
+        }
+        catch(EmailException objEmailEx)
+        {
+            System.Log('Invlaide email address');
+            throw new EmailException('Invalid Email');
+        }*/
         
 
     }
-
     
 }
