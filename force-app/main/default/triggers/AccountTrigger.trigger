@@ -1,4 +1,4 @@
-trigger AccountTrigger on Account (before delete, before insert, before update) 
+trigger AccountTrigger on Account (before delete, before insert, before update, after update, after insert, after delete) 
 {
 
     // events - Determines when the trigger code should run
@@ -94,7 +94,8 @@ trigger AccountTrigger on Account (before delete, before insert, before update)
             mapAccounts.put(accRec.Id, accRec); // this amp will have all the 3 accounts
         }
 
-        // Step 4: Loop thru account with open opportunites and throw error back to UI
+        // Step 4: Loop thru account with open
+        // opportunites and throw error back to UI
         for(Id accId :accsIdsWithOpenOpps) // accsIdsWithOpenOpps will have account Ids that have open opportunites  
         {
             
@@ -110,6 +111,15 @@ trigger AccountTrigger on Account (before delete, before insert, before update)
     if(Trigger.isInsert && Trigger.isBefore)
     {
         // write the logic
+    }
+
+    if(Trigger.isInsert && Trigger.isAfter)
+    {
+        
+        // Step 1: Access new account(s) being created using context variable Trigger.new
+        // Call the method and pass on the list of accounts
+        AccountWithDefaultContact.CreateDefaultContact(Trigger.new);
+
     }
 
     // Use case #3: Update Account record with auto generated account number whenever a new account is created  

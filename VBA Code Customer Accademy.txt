@@ -1,0 +1,534 @@
+Sub CopyEmployeePrimarySkillToTargetSheet()
+    ' Define variables for input cells
+    Dim startIndex As Range
+    Dim endIndex As Range
+    Dim sourceSheetName As Range
+    Dim targetSheet As Worksheet
+    
+    ' Set the input cells
+    Set startIndex = ThisWorkbook.Sheets("Check #1 - Primary - V1").Range("B2")
+    Set endIndex = ThisWorkbook.Sheets("Check #1 - Primary - V1").Range("B3")
+    Set sourceSheetName = ThisWorkbook.Sheets("Check #1 - Primary - V1").Range("B4")
+    Set targetSheet = ThisWorkbook.Sheets("Check #1 - Primary - V1")
+    
+    ' Get the range and sheet name from input
+    Dim startCell As String
+    Dim endCell As String
+    Dim sourceSheet As Worksheet
+    
+    startCell = startIndex.Value
+    endCell = endIndex.Value
+    Set sourceSheet = ThisWorkbook.Sheets(sourceSheetName.Value)
+    
+    ' Define the range to be copied
+    Dim copyRange As Range
+    Set copyRange = sourceSheet.Range(startCell & ":" & endCell)
+    
+    ' Clear existing data in column A from A11 to the last used row
+    Dim lastRow As Long
+    lastRow = targetSheet.Cells(targetSheet.Rows.Count, "A").End(xlUp).Row
+    
+    If lastRow >= 11 Then
+        targetSheet.Range("A11:A" & lastRow).ClearContents
+    End If
+    
+    ' Define the target cell for pasting (A11)
+    Dim targetCell As Range
+    Set targetCell = targetSheet.Range("A11")
+    
+    ' Copy and paste the range
+    copyRange.Copy Destination:=targetCell
+    
+    MsgBox "Data copied successfully!", vbInformation
+End Sub
+
+Sub CopySecondarySkillsToTargetSheet_EmployeeTab()
+    FindSecondarySkillsWithValues "Check 1 - Secondary Skill", "B4", "B2", "B3", "A11"
+End Sub
+
+Sub CopySecondarySkillsToTargetSheet_RoleTab()
+    FindSecondarySkillsWithValues "Check 1 - Secondary Skill", "E4", "E2", "E3", "D11"
+End Sub
+'Sub FindSkillsWithValues()
+Sub FindSecondarySkillsWithValues(strInputSheetName, strSourceSheetNameIndex, strStartIndex, strEndIndex, strOutputCell)
+
+
+    ' Logic - For each column do a sum . If the sum is greater than 0 then get the column header and display from A11. Ensure no duplicates values are in the output
+    ' Define variables for input cells
+    Dim srcSheet As Worksheet
+    Dim destSheet As Worksheet
+    Dim startIndex As Range
+    Dim endIndex As Range
+    Dim outputCell As Range
+    Dim srcSheetName As String
+    Dim destSheetName As String
+    Dim startCell As String
+    Dim endCell As String
+    Dim outputRow As Long
+    Dim outputCol As Long
+    Dim currentCell As Range
+    Dim colSum As Double
+    Dim skill As String
+    Dim skillsDict As Object
+    
+    ' Initialize dictionary to store unique skills
+    Set skillsDict = CreateObject("Scripting.Dictionary")
+    
+    ' Read the sheet names and range addresses from the configuration cells
+    srcSheetName = ThisWorkbook.Sheets(strInputSheetName).Range(strSourceSheetNameIndex).Value ' Change to cell address holding source sheet name
+    startCell = ThisWorkbook.Sheets(strInputSheetName).Range(strStartIndex).Value ' Change to cell address holding start index
+    endCell = ThisWorkbook.Sheets(strInputSheetName).Range(strEndIndex).Value ' Change to cell address holding end index
+    Set outputCell = ThisWorkbook.Sheets(strInputSheetName).Range(strOutputCell) ' Change to cell address holding output start cell address
+    
+    ' Set the worksheets
+    Set srcSheet = ThisWorkbook.Sheets(srcSheetName)
+    Set destSheet = ThisWorkbook.Sheets(strInputSheetName)
+    
+    ' Set the start and end index ranges
+    Set startIndex = srcSheet.Range(startCell)
+    Set endIndex = srcSheet.Range(endCell)
+    
+    ' Clear previous results in the target sheet from the output cell onwards
+    outputCol = outputCell.Column
+    destSheet.Range(outputCell, destSheet.Cells(destSheet.Rows.Count, outputCol)).ClearContents
+    
+    ' Initialize output row
+    outputRow = outputCell.Row
+    
+    ' Loop through each column in the specified range to calculate the sum and identify non-zero columns
+    Dim colIndex As Long
+    For colIndex = startIndex.Column To endIndex.Column
+        colSum = Application.WorksheetFunction.Sum(srcSheet.Range(srcSheet.Cells(startIndex.Row, colIndex), srcSheet.Cells(endIndex.Row, colIndex)))
+        If colSum > 0 Then
+            ' Find the corresponding header (skill) in the first row
+            skill = srcSheet.Cells(3, colIndex).Value
+            ' Add skill to dictionary if not already present
+            If Not skillsDict.exists(skill) Then
+                skillsDict.Add skill, Nothing
+            End If
+        End If
+    Next colIndex
+    
+    ' Output the unique skills in transposed format
+    Dim key As Variant
+    For Each key In skillsDict.keys
+        destSheet.Cells(outputRow, outputCol).Value = key
+        outputRow = outputRow + 1
+    Next key
+    
+    MsgBox "Skills with values have been listed successfully!", vbInformation
+End Sub
+
+
+
+
+Sub CopyRolePrimarySkillToTargetSheet()
+    
+    ' call Copy data method
+    CopyDataToTargetSheet "Check #1 - Primary - V1", "F2", "F3", "F4", "E", "E11:E", "E11"
+
+End Sub
+
+Sub CopyRoleDataToTargetSheet()
+    
+    ' call Copy data method
+    CopyDataToTargetSheet "Check #4 - V1", "B2", "B3", "B4", "A", "A11:A", "A11"
+
+
+End Sub
+
+Sub CopyMasterRoleForCheck4()
+    
+    ' call Copy data method
+    CopyDataToTargetSheet "Check #4 - V1 - Roles match", "B2", "B3", "B4", "A", "A11:A", "A11"
+
+
+End Sub
+
+
+Sub CopyEmployeeRoleForCheck4()
+    
+    ' call Copy data method
+    CopyDataToTargetSheet "Check #4 - V1 - Roles match", "E2", "E3", "E4", "B", "B11:B", "B11"
+
+
+End Sub
+
+Sub CopyMasterRoleForCheck5()
+    
+    ' call Copy data method
+    CopyDataToTargetSheet "Check #5 - Role And PS Chk", "B2", "B3", "B4", "A", "A11:A", "A11"
+
+End Sub
+
+Sub CopyPrimarySkillFromRoleTabForCheck5()
+    
+    ' call Copy data method
+    CopyDataToTargetSheet "Check #5 - Role And PS Chk", "E2", "E3", "E4", "B", "B11:B", "B11"
+
+
+End Sub
+
+
+Sub CopyPrimarySkillToTargetSheet_Check6()
+    
+    ' call Copy data method
+    CopyDataToTargetSheet "Check #6-Proficiency & PS chk", "B2", "B3", "B4", "A", "A11:A", "A11"
+
+End Sub
+
+Sub CopySkillClassificationToTargetSheet_Check6()
+    
+    ' call Copy data method
+    CopyDataToTargetSheet_Transpose "Check #6-Proficiency & PS chk", "F2", "F3", "F4", "B", "B11:B", "B11"
+
+End Sub
+
+Sub CopyPrimarySkillToTargetSheet_Employee_Check6()
+    
+    ' call Copy data method
+    CopyDataToTargetSheet "Check #6-Proficiency & PS - Emp", "B2", "B3", "B4", "A", "A11:A", "A11"
+
+End Sub
+
+Sub CopySkillClassificationToTargetSheet_Employee_Check6()
+    
+    ' call Copy data method
+    CopyDataToTargetSheet_Transpose "Check #6-Proficiency & PS - Emp", "F2", "F3", "F4", "B", "B11:B", "B11"
+
+End Sub
+
+
+Sub CopyDataToTargetSheet(strSheetName, strStartIndex, strEndIndex, strSourceSheetName, strDisplayDataStartColumnName, strDisplayDataRange, strDisplayDataStartCellIndex)
+    ' Define variables for input cells
+    Dim startIndex As Range
+    Dim endIndex As Range
+    Dim sourceSheetName As Range
+    Dim targetSheet As Worksheet
+    
+    ' Set the input cells
+    Set startIndex = ThisWorkbook.Sheets(strSheetName).Range(strStartIndex)
+    Set endIndex = ThisWorkbook.Sheets(strSheetName).Range(strEndIndex)
+    Set sourceSheetName = ThisWorkbook.Sheets(strSheetName).Range(strSourceSheetName)
+    Set targetSheet = ThisWorkbook.Sheets(strSheetName)
+    
+    ' Get the range and sheet name from input
+    Dim startCell As String
+    Dim endCell As String
+    Dim sourceSheet As Worksheet
+    
+    startCell = startIndex.Value
+    endCell = endIndex.Value
+    Set sourceSheet = ThisWorkbook.Sheets(sourceSheetName.Value)
+    
+    ' Define the range to be copied
+    Dim copyRange As Range
+    Set copyRange = sourceSheet.Range(startCell & ":" & endCell)
+    
+    ' Clear existing data in column A from A11 to the last used row
+    Dim lastRow As Long
+    lastRow = targetSheet.Cells(targetSheet.Rows.Count, strDisplayDataStartColumnName).End(xlUp).Row
+    
+    If lastRow >= 11 Then
+        targetSheet.Range(strDisplayDataRange & lastRow).ClearContents
+    End If
+    
+    ' Define the target cell for pasting (A11)
+    Dim targetCell As Range
+    Set targetCell = targetSheet.Range(strDisplayDataStartCellIndex)
+    
+    ' Copy and paste the range
+    copyRange.Copy Destination:=targetCell
+    
+    MsgBox "Data copied successfully!", vbInformation
+End Sub
+Sub CopyDataToTargetSheet_Transpose(strSheetName, strStartIndex, strEndIndex, strSourceSheetName, strDisplayDataStartColumnName, strDisplayDataRange, strDisplayDataStartCellIndex)
+    ' Define variables for input cells
+    Dim startIndex As Range
+    Dim endIndex As Range
+    Dim sourceSheetName As Range
+    Dim targetSheet As Worksheet
+    
+    ' Set the input cells
+    Set startIndex = ThisWorkbook.Sheets(strSheetName).Range(strStartIndex)
+    Set endIndex = ThisWorkbook.Sheets(strSheetName).Range(strEndIndex)
+    Set sourceSheetName = ThisWorkbook.Sheets(strSheetName).Range(strSourceSheetName)
+    Set targetSheet = ThisWorkbook.Sheets(strSheetName)
+    
+    ' Get the range and sheet name from input
+    Dim startCell As String
+    Dim endCell As String
+    Dim sourceSheet As Worksheet
+    
+    startCell = startIndex.Value
+    endCell = endIndex.Value
+    Set sourceSheet = ThisWorkbook.Sheets(sourceSheetName.Value)
+    
+    ' Define the range to be copied
+    Dim copyRange As Range
+    Set copyRange = sourceSheet.Range(startCell & ":" & endCell)
+    
+    ' Clear existing data in column A from A11 to the last used row
+    Dim lastRow As Long
+    lastRow = targetSheet.Cells(targetSheet.Rows.Count, strDisplayDataStartColumnName).End(xlUp).Row
+    
+    If lastRow >= 11 Then
+        targetSheet.Range(strDisplayDataRange & lastRow).ClearContents
+    End If
+    
+    ' Define the target cell for pasting (A11)
+    Dim targetCell As Range
+    Set targetCell = targetSheet.Range(strDisplayDataStartCellIndex)
+    
+   ' Copy and transpose the range
+    targetCell.Resize(copyRange.Columns.Count, copyRange.Rows.Count).Value = WorksheetFunction.Transpose(copyRange.Value)
+    
+    
+    MsgBox "Data copied successfully!", vbInformation
+End Sub
+
+
+Sub ApplyConditionalFormatting_RolesTab()
+    
+    'Call formatting method
+    ApplyOrRemoveConditionalFormatting "Check #9-Proficiency Range Chk", "B2", "B3", "B4", True
+
+End Sub
+
+Sub ApplyConditionalFormatting_EmployeeTab()
+    
+    'Call formatting method
+    ApplyOrRemoveConditionalFormatting "Check #9-Proficiency Range Chk", "E2", "E3", "E4", True
+
+End Sub
+
+Sub RemoveConditionalFormatting_RolesTab()
+    
+    'Call formatting method
+    ApplyOrRemoveConditionalFormatting "Check #9-Proficiency Range Chk", "B2", "B3", "B4", False
+
+End Sub
+
+Sub RemoveConditionalFormatting_EmployeeTab()
+    
+    'Call formatting method
+    ApplyOrRemoveConditionalFormatting "Check #9-Proficiency Range Chk", "E2", "E3", "E4", False
+
+End Sub
+
+Sub ApplyOrRemoveConditionalFormatting(strInputSheetName, strStartIndex, strEndIndex, strSourceSheetName, IsApplyFormatting)
+    ' Define variables for input cells
+    Dim startIndex As Range
+    Dim endIndex As Range
+    Dim sheetName As Range
+    
+    ' Set the input cells
+    Set startIndex = ThisWorkbook.Sheets(strInputSheetName).Range(strStartIndex)
+    Set endIndex = ThisWorkbook.Sheets(strInputSheetName).Range(strEndIndex)
+    Set sheetName = ThisWorkbook.Sheets(strInputSheetName).Range(strSourceSheetName)
+    
+    ' Get the range and sheet name from input
+    Dim startCell As String
+    Dim endCell As String
+    Dim ws As Worksheet
+    
+    startCell = startIndex.Value
+    endCell = endIndex.Value
+    Set ws = ThisWorkbook.Sheets(sheetName.Value)
+    
+    ' Define the range for conditional formatting
+    Dim rng As Range
+    Set rng = ws.Range(startCell & ":" & endCell)
+    
+    
+    ' Clear any existing conditional formats in the range
+    If IsApplyFormatting = False Then
+        
+        rng.FormatConditions.Delete
+        
+        MsgBox "Conditional formatting removed successfully!", vbInformation
+    
+    End If
+    
+    ' Apply the new conditional formatting rule
+    If IsApplyFormatting = True Then
+        With rng.FormatConditions.Add(Type:=xlExpression, Formula1:="=AND(ISNUMBER(" & startCell & "), OR(" & startCell & "<1, " & startCell & ">5, " & startCell & "=0))")
+            .Interior.Color = RGB(255, 0, 0) ' Set the fill color
+        End With
+        
+        MsgBox "Conditional formatting applied successfully!", vbInformation
+    End If
+    
+    
+    
+End Sub
+
+Sub CheckIfPrimarySkillExistsInSkillClassification()
+    Dim srcSheet As Worksheet
+    Dim destSheet As Worksheet
+    Dim skillRange As Range
+    Dim skillCell As Range
+    Dim classificationRange As Range
+    Dim resultCell As Range
+    Dim srcSheetName As String
+    Dim destSheetName As String
+    Dim resultCellAddress As String
+    
+    ' Set the sheet names and output cell address
+    srcSheetName = "Role Based skill" ' Change this to your source sheet name
+    destSheetName = "Check #6-Proficiency & PS chk " ' Change this to your destination sheet name
+    resultCellAddress = "E11" ' Change this to your desired output cell address
+    
+    ' Set the worksheets
+    Set srcSheet = ThisWorkbook.Sheets(srcSheetName)
+    Set destSheet = ThisWorkbook.Sheets(destSheetName)
+    
+    ' Set the ranges
+    Set skillRange = srcSheet.Range("E4:E" & srcSheet.Cells(srcSheet.Rows.Count, "E").End(xlUp).Row) ' Adjust if necessary
+    Set classificationRange = srcSheet.Range("F3:AT3") ' Adjust if necessary
+    
+    ' Clear previous results without affecting other columns
+    Dim resultColumn As Range
+    Set resultColumn = destSheet.Range(resultCellAddress).Resize(skillRange.Rows.Count, 1)
+    resultColumn.ClearContents
+    
+    ' Loop through each primary skill
+    For Each skillCell In skillRange
+        Set resultCell = destSheet.Range(resultCellAddress).Offset(skillCell.Row - skillRange.Row, 0)
+        
+        If IsError(Application.Match(skillCell.Value, classificationRange, 0)) Then
+            resultCell.Value = "Primary Skill Classification Does not exist"
+        Else
+            resultCell.Value = "Primary Skill Classification Exists"
+        End If
+    Next skillCell
+    
+    MsgBox "Classification check completed!", vbInformation
+End Sub
+
+Sub CheckIfPrimarySkillHasProficiencyDefined_RoleTab()
+
+    CheckIfPrimarySkillHasProficiencyDefined_V1 "Check #6-Proficiency & PS chk", "B4", "B5", "D2", "D3", "D4", "D5"
+End Sub
+
+Sub CheckIfPrimarySkillHasProficiencyDefined_EmployeeTab()
+
+    CheckIfPrimarySkillHasProficiencyDefined_V1 "Check #6-Proficiency & PS - Emp", "B4", "B5", "D2", "D3", "D4", "D5"
+End Sub
+
+
+Sub CheckIfPrimarySkillHasProficiencyDefined_V1(strInputSheetName, strSourceSheetNameIndex, strDestinationSheetNameIndex, strPrimarySkillRangeIndex, strSkillClassificationRangeIndex, strDisplayDataStartCellIndex, strPrimarySkillColumnName)
+   
+    Dim srcSheet As Worksheet
+    Dim destSheet As Worksheet
+    Dim skillRange As Range ' refers primary skill range
+    Dim skillCell As Range
+    Dim skillDataColumn As String
+    Dim classificationRange As Range ' refers skill classification range
+    Dim resultCell As Range
+    Dim srcSheetName As String
+    Dim destSheetName As String
+    Dim skillRangeAddress As String
+    Dim classificationRangeAddress As String
+    Dim resultCellAddress As String
+    
+    ' Read the sheet names and ranges from the cells
+    srcSheetName = ThisWorkbook.Sheets(strInputSheetName).Range(strSourceSheetNameIndex).Value ' Change to cell address holding source sheet name
+    destSheetName = ThisWorkbook.Sheets(strInputSheetName).Range(strDestinationSheetNameIndex).Value ' Change to cell address holding destination sheet name
+    skillRangeAddress = ThisWorkbook.Sheets(strInputSheetName).Range(strPrimarySkillRangeIndex).Value ' Change to cell address holding skill range
+    classificationRangeAddress = ThisWorkbook.Sheets(strInputSheetName).Range(strSkillClassificationRangeIndex).Value ' Change to cell address holding classification range
+    resultCellAddress = ThisWorkbook.Sheets(strInputSheetName).Range(strDisplayDataStartCellIndex).Value ' Change to cell address holding output start cell address
+    skillDataColumn = ThisWorkbook.Sheets(strInputSheetName).Range(strPrimarySkillColumnName).Value
+    ' Set the worksheets
+    Set srcSheet = ThisWorkbook.Sheets(srcSheetName)
+    Set destSheet = ThisWorkbook.Sheets(destSheetName)
+    
+    ' Set the ranges
+    'Set skillRange = srcSheet.Range(skillRangeAddress)
+    'Set classificationRange = srcSheet.Range(classificationRangeAddress)
+    
+     ' Set the ranges
+    Set skillRange = srcSheet.Range(skillRangeAddress & srcSheet.Cells(srcSheet.Rows.Count, skillDataColumn).End(xlUp).Row) ' Adjust if necessary
+    Set classificationRange = srcSheet.Range(classificationRangeAddress) ' Adjust if necessary
+    
+    
+    ' Clear previous results without affecting other columns
+    Dim resultColumn As Range
+    Set resultColumn = destSheet.Range(resultCellAddress).Resize(skillRange.Rows.Count, 1)
+    resultColumn.ClearContents
+    
+    ' Loop through each primary skill
+    Dim matchIndex As Variant
+    For Each skillCell In skillRange
+        Set resultCell = destSheet.Range(resultCellAddress).Offset(skillCell.Row - skillRange.Row, 0)
+        
+        matchIndex = Application.Match(skillCell.Value, classificationRange, 0)
+        If IsError(matchIndex) Then
+            resultCell.Value = "Primary Skill Classification Does not exist"
+        Else
+            Dim intersectCell As Range
+            Set intersectCell = srcSheet.Cells(skillCell.Row, classificationRange.Cells(1, matchIndex).Column)
+            If intersectCell.Value <> "" Then
+                resultCell.Value = "Proficiency For Primary Skill exists"
+            Else
+                resultCell.Value = "Proficiency For Primary Skill Not exists"
+            End If
+        End If
+    Next skillCell
+    
+    MsgBox "Proficiency check completed!", vbInformation
+End Sub
+
+'Sub CheckIfPrimarySkillHasProficiencyDefined(strSheetName, strStartIndex, strEndIndex, strSourceSheetName, strPrimarySkillDataColumnRange, strPrimarySkillDataColumn, strSkillClassificationHeaderRange, strDisplayDataStartCellIndex)
+    
+Sub CheckIfPrimarySkillHasProficiencyDefined()
+    Dim srcSheet As Worksheet
+    Dim destSheet As Worksheet
+    Dim skillRange As Range
+    Dim skillCell As Range
+    Dim classificationRange As Range
+    Dim resultCell As Range
+    Dim srcSheetName As String
+    Dim destSheetName As String
+    Dim resultCellAddress As String
+    
+    ' Set the sheet names and output cell address
+    srcSheetName = "Role Based skill" ' Change this to your source sheet name
+    destSheetName = "Check #6-Proficiency & PS chk" ' Change this to your destination sheet name
+    resultCellAddress = "E11" ' Change this to your desired output cell address
+    
+    ' Set the worksheets
+    Set srcSheet = ThisWorkbook.Sheets(srcSheetName)
+    Set destSheet = ThisWorkbook.Sheets(destSheetName)
+    
+    ' Set the ranges
+    Set skillRange = srcSheet.Range("E4:E" & srcSheet.Cells(srcSheet.Rows.Count, "E").End(xlUp).Row) ' Adjust if necessary
+    Set classificationRange = srcSheet.Range("F3:AT3") ' Adjust if necessary
+    
+    ' Clear previous results without affecting other columns
+    Dim resultColumn As Range
+    Set resultColumn = destSheet.Range(resultCellAddress).Resize(skillRange.Rows.Count, 1)
+    resultColumn.ClearContents
+    
+    ' Loop through each primary skill
+    Dim matchIndex As Variant
+    For Each skillCell In skillRange
+        Set resultCell = destSheet.Range(resultCellAddress).Offset(skillCell.Row - skillRange.Row, 0)
+        
+        matchIndex = Application.Match(skillCell.Value, classificationRange, 0)
+        If IsError(matchIndex) Then
+            resultCell.Value = "Primary Skill Classification Does not exist"
+        Else
+            Dim intersectCell As Range
+            Set intersectCell = srcSheet.Cells(skillCell.Row, classificationRange.Cells(1, matchIndex).Column)
+            If intersectCell.Value <> "" Then
+                resultCell.Value = "Proficiency For Primary Skill exists"
+            Else
+                resultCell.Value = "Proficiency For Primary Skill Not exists"
+            End If
+        End If
+    Next skillCell
+    
+    MsgBox "Proficiency check completed!", vbInformation
+End Sub
+
