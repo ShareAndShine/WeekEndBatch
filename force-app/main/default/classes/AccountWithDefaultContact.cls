@@ -1,8 +1,5 @@
 public with sharing class AccountWithDefaultContact {
-    public AccountWithDefaultContact() {
-
-    }
-
+    
     public static void CreateDefaultContact(List<Account> lstaccs) 
     {
 
@@ -47,7 +44,11 @@ public with sharing class AccountWithDefaultContact {
     // Bulkified
     insert conRec;
 
+    // Expected result: 1 contact record should be created . total contact record should be 1
+
     }
+
+
 
 
 }
