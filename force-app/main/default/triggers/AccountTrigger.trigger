@@ -120,6 +120,12 @@ trigger AccountTrigger on Account (before delete, before insert, before update, 
         // Call the method and pass on the list of accounts
         AccountWithDefaultContact.CreateDefaultContact(Trigger.new);
 
+        // Find all the acccounts being created and assign them to a list
+        List<Account> accsNewRecs = Trigger.new;
+
+        // call helper method
+        AccountHelper.CreateOpportunties(accsNewRecs);
+
     }
 
     // Use case #3: Update Account record with auto generated account number whenever a new account is created  
