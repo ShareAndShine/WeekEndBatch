@@ -1,10 +1,7 @@
 
 // Use Case: Business team is looking to backup all customer orders everyday and move to a 3rd party database (MS Azure SQL)
 public with sharing class BackupOrdersData implements Database.Batchable<SObject>{
-    public ResetContactBestModeToConnect() {
-
-    }
-
+   
     public Database.QueryLocator start(Database.BatchableContext bc)
     {
         
@@ -15,11 +12,17 @@ public with sharing class BackupOrdersData implements Database.Batchable<SObject
         
     }
 
-    public void execute(Database.BatchableContext bc, List<Contact> contactsScope)
+    public void execute(Database.BatchableContext bc, List<Order> OrderRecs)
     {
         // Step 2: Update the records retrieved in the start method
 
         // Write logic to connect to AZ URE SQL DB
+
+        HttpRequest req = new HttpRequest();
+         req.setEndpoint('https://routes.googleapis.com/directions/v2:computeRoutes?key=YOUR_API_KEY');
+                req.setMethod('POST');
+                req.setHeader('Authorization', 'Bearer ' + '{!.Password}');
+            
         
         // Send Data
 

@@ -8,7 +8,6 @@ public with sharing class ResetContactBestModeToConnect implements Database.Batc
 
     public Database.QueryLocator start(Database.BatchableContext bc)
     {
-        
         // Step 1: Query the data to be processed 
         String szQuery = 'SELECT Id, Name, Best_Mode_To_Connect__c FROM Contact';
         
